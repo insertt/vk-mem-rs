@@ -42,7 +42,7 @@ fn main() {
     let source_files = ["wrapper/vma_lib.cpp"];
 
     for source_file in &source_files {
-        build.file(&source_file);
+        build.file(source_file);
     }
 
     let target = env::var("TARGET").unwrap();
@@ -125,7 +125,7 @@ fn generate_bindings(output_file: &str) {
         .raw_line("#![allow(non_camel_case_types)]")
         .raw_line("#![allow(non_snake_case)]")
         .raw_line("#![allow(dead_code)]")
-        .raw_line("use ash::vk::*;")
+        .raw_line("use spark::vk::*;")
         .trust_clang_mangling(false)
         .layout_tests(false)
         .rustified_enum("Vma.*")
@@ -148,12 +148,12 @@ struct FixAshTypes;
 impl bindgen::callbacks::ParseCallbacks for FixAshTypes {
     fn item_name(&self, original_item_name: &str) -> Option<String> {
         if original_item_name.starts_with("Vk") {
-            // Strip `Vk` prefix, will use `ash::vk::*` instead
+            // Strip `Vk` prefix, will use `spark::vk::*` instead
             Some(original_item_name.trim_start_matches("Vk").to_string())
-        } else if original_item_name.starts_with("PFN_vk") && original_item_name.ends_with("KHR") {
+        } else if original_item_name.starts_with("PFN_vk") {
             // VMA uses a few extensions like `PFN_vkGetBufferMemoryRequirements2KHR`,
-            // ash keeps these as `PFN_vkGetBufferMemoryRequirements2`
-            Some(original_item_name.trim_end_matches("KHR").to_string())
+            // ash keeps these as `FnGetBufferMemoryRequirements2`
+            Some(original_item_name.replace("PFN_vk", "Fn").trim_end_matches("KHR").to_string())
         } else {
             None
         }

@@ -10,25 +10,25 @@ fn extension_names() -> Vec<*const i8> {
 }
 
 unsafe extern "system" fn vulkan_debug_callback(
-    _message_severity: ash::vk::DebugUtilsMessageSeverityFlagsEXT,
-    _message_types: ash::vk::DebugUtilsMessageTypeFlagsEXT,
-    p_callback_data: *const ash::vk::DebugUtilsMessengerCallbackDataEXT,
+    _message_severity: spark::vk::DebugUtilsMessageSeverityFlagsEXT,
+    _message_types: spark::vk::DebugUtilsMessageTypeFlagsEXT,
+    p_callback_data: *const spark::vk::DebugUtilsMessengerCallbackDataEXT,
     _p_user_data: *mut c_void,
-) -> ash::vk::Bool32 {
+) -> spark::vk::Bool32 {
     let p_callback_data = &*p_callback_data;
     println!(
         "{:?}",
         ::std::ffi::CStr::from_ptr(p_callback_data.p_message)
     );
-    ash::vk::FALSE
+    spark::vk::FALSE
 }
 
 pub struct TestHarness {
     pub entry: ash::Entry,
     pub instance: ash::Instance,
     pub device: ash::Device,
-    pub physical_device: ash::vk::PhysicalDevice,
-    pub debug_callback: ash::vk::DebugUtilsMessengerEXT,
+    pub physical_device: spark::vk::PhysicalDevice,
+    pub debug_callback: spark::vk::DebugUtilsMessengerEXT,
     pub debug_report_loader: ash::extensions::ext::DebugUtils,
 }
 
@@ -46,12 +46,12 @@ impl Drop for TestHarness {
 impl TestHarness {
     pub fn new() -> Self {
         let app_name = ::std::ffi::CString::new("vk-mem testing").unwrap();
-        let app_info = ash::vk::ApplicationInfo::builder()
+        let app_info = spark::vk::ApplicationInfo::builder()
             .application_name(&app_name)
             .application_version(0)
             .engine_name(&app_name)
             .engine_version(0)
-            .api_version(ash::vk::make_api_version(0, 1, 3, 0));
+            .api_version(spark::vk::make_api_version(0, 1, 3, 0));
 
         let layer_names = [::std::ffi::CString::new("VK_LAYER_KHRONOS_validation").unwrap()];
         let layers_names_raw: Vec<*const i8> = layer_names
@@ -60,7 +60,7 @@ impl TestHarness {
             .collect();
 
         let extension_names_raw = extension_names();
-        let create_info = ash::vk::InstanceCreateInfo::builder()
+        let create_info = spark::vk::InstanceCreateInfo::builder()
             .application_info(&app_info)
             .enabled_layer_names(&layers_names_raw)
             .enabled_extension_names(&extension_names_raw);
@@ -72,10 +72,10 @@ impl TestHarness {
                 .expect("Instance creation error")
         };
 
-        let debug_info = ash::vk::DebugUtilsMessengerCreateInfoEXT::builder()
+        let debug_info = spark::vk::DebugUtilsMessengerCreateInfoEXT::builder()
             .message_severity(
-                ash::vk::DebugUtilsMessageSeverityFlagsEXT::ERROR
-                    | ash::vk::DebugUtilsMessageSeverityFlagsEXT::WARNING,
+                spark::vk::DebugUtilsMessageSeverityFlagsEXT::ERROR
+                    | spark::vk::DebugUtilsMessageSeverityFlagsEXT::WARNING,
             )
             .message_type(
                 vk::DebugUtilsMessageTypeFlagsEXT::GENERAL
@@ -115,13 +115,13 @@ impl TestHarness {
 
         let priorities = [1.0];
 
-        let queue_info = [ash::vk::DeviceQueueCreateInfo::builder()
+        let queue_info = [spark::vk::DeviceQueueCreateInfo::builder()
             .queue_family_index(queue_family_index as u32)
             .queue_priorities(&priorities)
             .build()];
 
         let device_create_info =
-            ash::vk::DeviceCreateInfo::builder().queue_create_infos(&queue_info);
+            spark::vk::DeviceCreateInfo::builder().queue_create_infos(&queue_info);
 
         let device: ash::Device = unsafe {
             instance
@@ -169,11 +169,11 @@ fn create_gpu_buffer() {
     unsafe {
         let (buffer, allocation) = allocator
             .create_buffer(
-                &ash::vk::BufferCreateInfo::builder()
+                &spark::vk::BufferCreateInfo::builder()
                     .size(16 * 1024)
                     .usage(
-                        ash::vk::BufferUsageFlags::VERTEX_BUFFER
-                            | ash::vk::BufferUsageFlags::TRANSFER_DST,
+                        spark::vk::BufferUsageFlags::VERTEX_BUFFER
+                            | spark::vk::BufferUsageFlags::TRANSFER_DST,
                     )
                     .build(),
                 &allocation_info,
@@ -190,20 +190,20 @@ fn create_cpu_buffer_preferred() {
     let harness = TestHarness::new();
     let allocator = harness.create_allocator();
     let allocation_info = vk_mem::AllocationCreateInfo {
-        required_flags: ash::vk::MemoryPropertyFlags::HOST_VISIBLE,
-        preferred_flags: ash::vk::MemoryPropertyFlags::HOST_COHERENT
-            | ash::vk::MemoryPropertyFlags::HOST_CACHED,
+        required_flags: spark::vk::MemoryPropertyFlags::HOST_VISIBLE,
+        preferred_flags: spark::vk::MemoryPropertyFlags::HOST_COHERENT
+            | spark::vk::MemoryPropertyFlags::HOST_CACHED,
         flags: vk_mem::AllocationCreateFlags::MAPPED,
         ..Default::default()
     };
     unsafe {
         let (buffer, allocation) = allocator
             .create_buffer(
-                &ash::vk::BufferCreateInfo::builder()
+                &spark::vk::BufferCreateInfo::builder()
                     .size(16 * 1024)
                     .usage(
-                        ash::vk::BufferUsageFlags::VERTEX_BUFFER
-                            | ash::vk::BufferUsageFlags::TRANSFER_DST,
+                        spark::vk::BufferUsageFlags::VERTEX_BUFFER
+                            | spark::vk::BufferUsageFlags::TRANSFER_DST,
                     )
                     .build(),
                 &allocation_info,
@@ -221,15 +221,15 @@ fn create_gpu_buffer_pool() {
     let allocator = harness.create_allocator();
     let allocator = Arc::new(allocator);
 
-    let buffer_info = ash::vk::BufferCreateInfo::builder()
+    let buffer_info = spark::vk::BufferCreateInfo::builder()
         .size(16 * 1024)
-        .usage(ash::vk::BufferUsageFlags::UNIFORM_BUFFER | ash::vk::BufferUsageFlags::TRANSFER_DST)
+        .usage(spark::vk::BufferUsageFlags::UNIFORM_BUFFER | spark::vk::BufferUsageFlags::TRANSFER_DST)
         .build();
 
     let allocation_info = vk_mem::AllocationCreateInfo {
-        required_flags: ash::vk::MemoryPropertyFlags::HOST_VISIBLE,
-        preferred_flags: ash::vk::MemoryPropertyFlags::HOST_COHERENT
-            | ash::vk::MemoryPropertyFlags::HOST_CACHED,
+        required_flags: spark::vk::MemoryPropertyFlags::HOST_VISIBLE,
+        preferred_flags: spark::vk::MemoryPropertyFlags::HOST_COHERENT
+            | spark::vk::MemoryPropertyFlags::HOST_CACHED,
         flags: vk_mem::AllocationCreateFlags::MAPPED,
 
         ..Default::default()
@@ -271,11 +271,11 @@ fn test_gpu_stats() {
 
         let (buffer, allocation) = allocator
             .create_buffer(
-                &ash::vk::BufferCreateInfo::builder()
+                &spark::vk::BufferCreateInfo::builder()
                     .size(16 * 1024)
                     .usage(
-                        ash::vk::BufferUsageFlags::VERTEX_BUFFER
-                            | ash::vk::BufferUsageFlags::TRANSFER_DST,
+                        spark::vk::BufferUsageFlags::VERTEX_BUFFER
+                            | spark::vk::BufferUsageFlags::TRANSFER_DST,
                     )
                     .build(),
                 &allocation_info,
@@ -377,7 +377,7 @@ fn virtual_block_out_of_space() {
     unsafe {
         match virtual_block.allocate(allocation_info) {
             Ok(_) => panic!("Created VirtualAllocation larger than VirtualBlock"),
-            Err(ash::vk::Result::ERROR_OUT_OF_DEVICE_MEMORY) => {},
+            Err(spark::vk::Result::ERROR_OUT_OF_DEVICE_MEMORY) => {},
             Err(_) => panic!("Unexpected VirtualBlock error"),
         }
     }

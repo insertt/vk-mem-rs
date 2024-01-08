@@ -3,13 +3,9 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 #![allow(dead_code)]
-use ash::vk::*;
+use spark::vk::*;
 
-pub type __uint8_t = ::std::os::raw::c_uchar;
-pub type __int32_t = ::std::os::raw::c_int;
-pub type __uint32_t = ::std::os::raw::c_uint;
-pub type __uint64_t = ::std::os::raw::c_ulong;
-#[repr(u32)]
+#[repr(i32)]
 #[doc = " Flags for created #VmaAllocator."]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum VmaAllocatorCreateFlagBits {
@@ -129,7 +125,7 @@ pub enum VmaAllocatorCreateFlagBits {
 }
 #[doc = " See #VmaAllocatorCreateFlagBits."]
 pub type VmaAllocatorCreateFlags = Flags;
-#[repr(u32)]
+#[repr(i32)]
 #[doc = " \\brief Intended usage of the allocated memory."]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum VmaMemoryUsage {
@@ -208,7 +204,7 @@ impl VmaAllocationCreateFlagBits {
     pub const VMA_ALLOCATION_CREATE_STRATEGY_FIRST_FIT_BIT: VmaAllocationCreateFlagBits =
         VmaAllocationCreateFlagBits::VMA_ALLOCATION_CREATE_STRATEGY_MIN_TIME_BIT;
 }
-#[repr(u32)]
+#[repr(i32)]
 #[doc = " Flags to be passed as VmaAllocationCreateInfo::flags."]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum VmaAllocationCreateFlagBits {
@@ -305,7 +301,7 @@ pub enum VmaAllocationCreateFlagBits {
     VMA_ALLOCATION_CREATE_STRATEGY_MIN_TIME_BIT = 131072,
     #[doc = " Allocation strategy that chooses always the lowest offset in available space."]
     #[doc = "This is not the most efficient strategy but achieves highly packed data."]
-    #[doc = "Used internally by defragmentation, not recommended in typical usage."]
+    #[doc = "Used internally by defragmentation, not recomended in typical usage."]
     VMA_ALLOCATION_CREATE_STRATEGY_MIN_OFFSET_BIT = 262144,
     #[doc = " A bit mask to extract only `STRATEGY` bits from entire set of flags."]
     VMA_ALLOCATION_CREATE_STRATEGY_MASK = 458752,
@@ -318,7 +314,7 @@ impl VmaPoolCreateFlagBits {
     pub const VMA_POOL_CREATE_ALGORITHM_MASK: VmaPoolCreateFlagBits =
         VmaPoolCreateFlagBits::VMA_POOL_CREATE_LINEAR_ALGORITHM_BIT;
 }
-#[repr(u32)]
+#[repr(i32)]
 #[doc = " Flags to be passed as VmaPoolCreateInfo::flags."]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum VmaPoolCreateFlagBits {
@@ -355,7 +351,7 @@ pub enum VmaPoolCreateFlagBits {
 }
 #[doc = " Flags to be passed as VmaPoolCreateInfo::flags. See #VmaPoolCreateFlagBits."]
 pub type VmaPoolCreateFlags = Flags;
-#[repr(u32)]
+#[repr(i32)]
 #[doc = " Flags to be passed as VmaDefragmentationInfo::flags."]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum VmaDefragmentationFlagBits {
@@ -374,7 +370,7 @@ pub enum VmaDefragmentationFlagBits {
 }
 #[doc = " See #VmaDefragmentationFlagBits."]
 pub type VmaDefragmentationFlags = Flags;
-#[repr(u32)]
+#[repr(i32)]
 #[doc = " Operation performed on single defragmentation move. See structure #VmaDefragmentationMove."]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum VmaDefragmentationMoveOperation {
@@ -389,7 +385,7 @@ impl VmaVirtualBlockCreateFlagBits {
     pub const VMA_VIRTUAL_BLOCK_CREATE_ALGORITHM_MASK: VmaVirtualBlockCreateFlagBits =
         VmaVirtualBlockCreateFlagBits::VMA_VIRTUAL_BLOCK_CREATE_LINEAR_ALGORITHM_BIT;
 }
-#[repr(u32)]
+#[repr(i32)]
 #[doc = " Flags to be passed as VmaVirtualBlockCreateInfo::flags."]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum VmaVirtualBlockCreateFlagBits {
@@ -409,7 +405,7 @@ pub enum VmaVirtualBlockCreateFlagBits {
 }
 #[doc = " Flags to be passed as VmaVirtualBlockCreateInfo::flags. See #VmaVirtualBlockCreateFlagBits."]
 pub type VmaVirtualBlockCreateFlags = Flags;
-#[repr(u32)]
+#[repr(i32)]
 #[doc = " Flags to be passed as VmaVirtualAllocationCreateInfo::flags."]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum VmaVirtualAllocationCreateFlagBits {
@@ -513,39 +509,39 @@ pub struct VmaDeviceMemoryCallbacks {
 #[repr(C)]
 pub struct VmaVulkanFunctions {
     #[doc = " Required when using VMA_DYNAMIC_VULKAN_FUNCTIONS."]
-    pub vkGetInstanceProcAddr: PFN_vkGetInstanceProcAddr,
+    pub vkGetInstanceProcAddr: FnGetInstanceProcAddr,
     #[doc = " Required when using VMA_DYNAMIC_VULKAN_FUNCTIONS."]
-    pub vkGetDeviceProcAddr: PFN_vkGetDeviceProcAddr,
-    pub vkGetPhysicalDeviceProperties: PFN_vkGetPhysicalDeviceProperties,
-    pub vkGetPhysicalDeviceMemoryProperties: PFN_vkGetPhysicalDeviceMemoryProperties,
-    pub vkAllocateMemory: PFN_vkAllocateMemory,
-    pub vkFreeMemory: PFN_vkFreeMemory,
-    pub vkMapMemory: PFN_vkMapMemory,
-    pub vkUnmapMemory: PFN_vkUnmapMemory,
-    pub vkFlushMappedMemoryRanges: PFN_vkFlushMappedMemoryRanges,
-    pub vkInvalidateMappedMemoryRanges: PFN_vkInvalidateMappedMemoryRanges,
-    pub vkBindBufferMemory: PFN_vkBindBufferMemory,
-    pub vkBindImageMemory: PFN_vkBindImageMemory,
-    pub vkGetBufferMemoryRequirements: PFN_vkGetBufferMemoryRequirements,
-    pub vkGetImageMemoryRequirements: PFN_vkGetImageMemoryRequirements,
-    pub vkCreateBuffer: PFN_vkCreateBuffer,
-    pub vkDestroyBuffer: PFN_vkDestroyBuffer,
-    pub vkCreateImage: PFN_vkCreateImage,
-    pub vkDestroyImage: PFN_vkDestroyImage,
-    pub vkCmdCopyBuffer: PFN_vkCmdCopyBuffer,
+    pub vkGetDeviceProcAddr: FnGetDeviceProcAddr,
+    pub vkGetPhysicalDeviceProperties: FnGetPhysicalDeviceProperties,
+    pub vkGetPhysicalDeviceMemoryProperties: FnGetPhysicalDeviceMemoryProperties,
+    pub vkAllocateMemory: FnAllocateMemory,
+    pub vkFreeMemory: FnFreeMemory,
+    pub vkMapMemory: FnMapMemory,
+    pub vkUnmapMemory: FnUnmapMemory,
+    pub vkFlushMappedMemoryRanges: FnFlushMappedMemoryRanges,
+    pub vkInvalidateMappedMemoryRanges: FnInvalidateMappedMemoryRanges,
+    pub vkBindBufferMemory: FnBindBufferMemory,
+    pub vkBindImageMemory: FnBindImageMemory,
+    pub vkGetBufferMemoryRequirements: FnGetBufferMemoryRequirements,
+    pub vkGetImageMemoryRequirements: FnGetImageMemoryRequirements,
+    pub vkCreateBuffer: FnCreateBuffer,
+    pub vkDestroyBuffer: FnDestroyBuffer,
+    pub vkCreateImage: FnCreateImage,
+    pub vkDestroyImage: FnDestroyImage,
+    pub vkCmdCopyBuffer: FnCmdCopyBuffer,
     #[doc = " Fetch \"vkGetBufferMemoryRequirements2\" on Vulkan >= 1.1, fetch \"vkGetBufferMemoryRequirements2KHR\" when using VK_KHR_dedicated_allocation extension."]
-    pub vkGetBufferMemoryRequirements2KHR: PFN_vkGetBufferMemoryRequirements2,
+    pub vkGetBufferMemoryRequirements2KHR: FnGetBufferMemoryRequirements2,
     #[doc = " Fetch \"vkGetImageMemoryRequirements2\" on Vulkan >= 1.1, fetch \"vkGetImageMemoryRequirements2KHR\" when using VK_KHR_dedicated_allocation extension."]
-    pub vkGetImageMemoryRequirements2KHR: PFN_vkGetImageMemoryRequirements2,
+    pub vkGetImageMemoryRequirements2KHR: FnGetImageMemoryRequirements2,
     #[doc = " Fetch \"vkBindBufferMemory2\" on Vulkan >= 1.1, fetch \"vkBindBufferMemory2KHR\" when using VK_KHR_bind_memory2 extension."]
-    pub vkBindBufferMemory2KHR: PFN_vkBindBufferMemory2,
+    pub vkBindBufferMemory2KHR: FnBindBufferMemory2,
     #[doc = " Fetch \"vkBindImageMemory2\" on Vulkan >= 1.1, fetch \"vkBindImageMemory2KHR\" when using VK_KHR_bind_memory2 extension."]
-    pub vkBindImageMemory2KHR: PFN_vkBindImageMemory2,
-    pub vkGetPhysicalDeviceMemoryProperties2KHR: PFN_vkGetPhysicalDeviceMemoryProperties2,
+    pub vkBindImageMemory2KHR: FnBindImageMemory2,
+    pub vkGetPhysicalDeviceMemoryProperties2KHR: FnGetPhysicalDeviceMemoryProperties2,
     #[doc = " Fetch from \"vkGetDeviceBufferMemoryRequirements\" on Vulkan >= 1.3, but you can also fetch it from \"vkGetDeviceBufferMemoryRequirementsKHR\" if you enabled extension VK_KHR_maintenance4."]
-    pub vkGetDeviceBufferMemoryRequirements: PFN_vkGetDeviceBufferMemoryRequirements,
+    pub vkGetDeviceBufferMemoryRequirements: FnGetDeviceBufferMemoryRequirements,
     #[doc = " Fetch from \"vkGetDeviceImageMemoryRequirements\" on Vulkan >= 1.3, but you can also fetch it from \"vkGetDeviceImageMemoryRequirementsKHR\" if you enabled extension VK_KHR_maintenance4."]
-    pub vkGetDeviceImageMemoryRequirements: PFN_vkGetDeviceImageMemoryRequirements,
+    pub vkGetDeviceImageMemoryRequirements: FnGetDeviceImageMemoryRequirements,
 }
 #[doc = " Description of a Allocator to be created."]
 #[repr(C)]
@@ -1317,7 +1313,7 @@ extern "C" {
 extern "C" {
     #[doc = " \\brief Returns current information about specified allocation."]
     #[doc = ""]
-    #[doc = "Current parameters of given allocation are returned in `pAllocationInfo`."]
+    #[doc = "Current paramteres of given allocation are returned in `pAllocationInfo`."]
     #[doc = ""]
     #[doc = "Although this function doesn't lock any mutex, so it should be quite efficient,"]
     #[doc = "you should avoid calling it too often."]
@@ -1576,7 +1572,7 @@ extern "C" {
     #[doc = ""]
     #[doc = "\\param allocator Allocator object."]
     #[doc = "\\param context Context object that has been created by vmaBeginDefragmentation()."]
-    #[doc = "\\param[out] pPassInfo Computed information for current pass."]
+    #[doc = "\\param[out] pPassInfo Computed informations for current pass."]
     #[doc = "\\returns"]
     #[doc = "- `VK_SUCCESS` if no more moves are possible. Then you can omit call to vmaEndDefragmentationPass() and simply end whole defragmentation."]
     #[doc = "- `VK_INCOMPLETE` if there are pending moves returned in `pPassInfo`. You need to perform them, call vmaEndDefragmentationPass(),"]
@@ -1592,7 +1588,7 @@ extern "C" {
     #[doc = ""]
     #[doc = "\\param allocator Allocator object."]
     #[doc = "\\param context Context object that has been created by vmaBeginDefragmentation()."]
-    #[doc = "\\param pPassInfo Computed information for current pass filled by vmaBeginDefragmentationPass() and possibly modified by you."]
+    #[doc = "\\param pPassInfo Computed informations for current pass filled by vmaBeginDefragmentationPass() and possibly modified by you."]
     #[doc = ""]
     #[doc = "Returns `VK_SUCCESS` if no more moves are possible or `VK_INCOMPLETE` if more defragmentations are possible."]
     #[doc = ""]
@@ -1767,41 +1763,9 @@ extern "C" {
     #[doc = "If the function succeeded, you must destroy the buffer when you"]
     #[doc = "no longer need it using `vkDestroyBuffer()`. If you want to also destroy the corresponding"]
     #[doc = "allocation you can use convenience function vmaDestroyBuffer()."]
-    #[doc = ""]
-    #[doc = "\\note There is a new version of this function augmented with parameter `allocationLocalOffset` - see vmaCreateAliasingBuffer2()."]
     pub fn vmaCreateAliasingBuffer(
         allocator: VmaAllocator,
         allocation: VmaAllocation,
-        pBufferCreateInfo: *const BufferCreateInfo,
-        pBuffer: *mut Buffer,
-    ) -> Result;
-}
-extern "C" {
-    #[doc = " \\brief Creates a new `VkBuffer`, binds already created memory for it."]
-    #[doc = ""]
-    #[doc = "\\param allocator"]
-    #[doc = "\\param allocation Allocation that provides memory to be used for binding new buffer to it."]
-    #[doc = "\\param allocationLocalOffset Additional offset to be added while binding, relative to the beginning of the allocation. Normally it should be 0."]
-    #[doc = "\\param pBufferCreateInfo"]
-    #[doc = "\\param[out] pBuffer Buffer that was created."]
-    #[doc = ""]
-    #[doc = "This function automatically:"]
-    #[doc = ""]
-    #[doc = "-# Creates buffer."]
-    #[doc = "-# Binds the buffer with the supplied memory."]
-    #[doc = ""]
-    #[doc = "If any of these operations fail, buffer is not created,"]
-    #[doc = "returned value is negative error code and `*pBuffer` is null."]
-    #[doc = ""]
-    #[doc = "If the function succeeded, you must destroy the buffer when you"]
-    #[doc = "no longer need it using `vkDestroyBuffer()`. If you want to also destroy the corresponding"]
-    #[doc = "allocation you can use convenience function vmaDestroyBuffer()."]
-    #[doc = ""]
-    #[doc = "\\note This is a new version of the function augmented with parameter `allocationLocalOffset`."]
-    pub fn vmaCreateAliasingBuffer2(
-        allocator: VmaAllocator,
-        allocation: VmaAllocation,
-        allocationLocalOffset: DeviceSize,
         pBufferCreateInfo: *const BufferCreateInfo,
         pBuffer: *mut Buffer,
     ) -> Result;
@@ -1816,7 +1780,7 @@ extern "C" {
     #[doc = "vmaFreeMemory(allocator, allocation);"]
     #[doc = "\\endcode"]
     #[doc = ""]
-    #[doc = "It is safe to pass null as buffer and/or allocation."]
+    #[doc = "It it safe to pass null as buffer and/or allocation."]
     pub fn vmaDestroyBuffer(allocator: VmaAllocator, buffer: Buffer, allocation: VmaAllocation);
 }
 extern "C" {
@@ -1831,20 +1795,10 @@ extern "C" {
     ) -> Result;
 }
 extern "C" {
-    #[doc = " Function similar to vmaCreateAliasingBuffer() but for images."]
+    #[doc = " Function similar to vmaCreateAliasingBuffer()."]
     pub fn vmaCreateAliasingImage(
         allocator: VmaAllocator,
         allocation: VmaAllocation,
-        pImageCreateInfo: *const ImageCreateInfo,
-        pImage: *mut Image,
-    ) -> Result;
-}
-extern "C" {
-    #[doc = " Function similar to vmaCreateAliasingBuffer2() but for images."]
-    pub fn vmaCreateAliasingImage2(
-        allocator: VmaAllocator,
-        allocation: VmaAllocation,
-        allocationLocalOffset: DeviceSize,
         pImageCreateInfo: *const ImageCreateInfo,
         pImage: *mut Image,
     ) -> Result;
@@ -1859,7 +1813,7 @@ extern "C" {
     #[doc = "vmaFreeMemory(allocator, allocation);"]
     #[doc = "\\endcode"]
     #[doc = ""]
-    #[doc = "It is safe to pass null as image and/or allocation."]
+    #[doc = "It it safe to pass null as image and/or allocation."]
     pub fn vmaDestroyImage(allocator: VmaAllocator, image: Image, allocation: VmaAllocation);
 }
 extern "C" {

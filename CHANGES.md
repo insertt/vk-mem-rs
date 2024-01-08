@@ -74,7 +74,7 @@ Major changes:
   * `Allocator::defragmentation_end`
 * Added support for defragmentation of GPU memory.
 * Defragmentation of CPU memory now uses `memmove` internally, so it can move data to overlapping regions.
-* Defragmentation of CPU memory is now available for memory types that are `ash::vk::MemoryPropertyFlags::HOST_VISIBLE` but not `ash::vk::MemoryPropertyFlags::HOST_COHERENT`.
+* Defragmentation of CPU memory is now available for memory types that are `spark::vk::MemoryPropertyFlags::HOST_VISIBLE` but not `spark::vk::MemoryPropertyFlags::HOST_COHERENT`.
 * Major internal changes in defragmentation algorithm.
 * Old interface (structure `DefragmentationInfo`, function `Allocator::defragment`) is now deprecated.
 * Added buddy algorithm, available for custom pools:
@@ -96,7 +96,7 @@ Major changes:
 
 Minor changes:
 
-* Changed behavior of allocation functions to return `ash::vk::Result::ERROR_VALIDATION_FAILED_EXT` when trying to allocate memory of size 0, create buffer with size 0, or image with one of the dimensions 0.
+* Changed behavior of allocation functions to return `spark::vk::Result::ERROR_VALIDATION_FAILED_EXT` when trying to allocate memory of size 0, create buffer with size 0, or image with one of the dimensions 0.
 * Internal optimization: using read-write mutex on some platforms.
 * Many additions and fixes in documentation. Many compatibility fixes for various compilers. Other internal bugfixes, optimizations, refactoring, added more internal validation...
 

@@ -1,6 +1,6 @@
 use std::mem;
 use crate::ffi;
-use ash::prelude::VkResult;
+use spark::Result;
 
 use crate::definitions::*;
 
@@ -21,7 +21,7 @@ unsafe impl Sync for VirtualAllocation {}
 
 impl VirtualBlock {
     /// Creates new VirtualBlock object.
-    pub fn new(create_info: VirtualBlockCreateInfo) -> VkResult<Self> {
+    pub fn new(create_info: VirtualBlockCreateInfo) -> Result<Self> {
         unsafe {
             let mut internal: ffi::VmaVirtualBlock = mem::zeroed();
             ffi::vmaCreateVirtualBlock(&create_info.inner as *const _, &mut internal).result()?;
@@ -34,9 +34,9 @@ impl VirtualBlock {
     ///
     /// Possible error values:
     ///
-    /// - `ash::vk::Result::ERROR_OUT_OF_DEVICE_MEMORY` - Allocation failed due to not enough free space in the virtual block.
+    /// - `spark::vk::Result::ERROR_OUT_OF_DEVICE_MEMORY` - Allocation failed due to not enough free space in the virtual block.
     ///     (despite the function doesn't ever allocate actual GPU memory)
-    pub unsafe fn allocate(&self, allocation_info: VirtualAllocationCreateInfo) -> VkResult<(VirtualAllocation, u64)> {
+    pub unsafe fn allocate(&self, allocation_info: VirtualAllocationCreateInfo) -> Result<(VirtualAllocation, u64)> {
         let create_info: ffi::VmaVirtualAllocationCreateInfo = allocation_info.into();
         let mut allocation: ffi::VmaVirtualAllocation = std::mem::zeroed();
         let mut offset = 0;
@@ -71,7 +71,7 @@ impl VirtualBlock {
     }
 
     /// Returns information about a specific virtual allocation within a virtual block, like its size and user_data pointer.
-    pub unsafe fn get_allocation_info(&self, allocation: &VirtualAllocation) -> VkResult<VirtualAllocationInfo> {
+    pub unsafe fn get_allocation_info(&self, allocation: &VirtualAllocation) -> Result<VirtualAllocationInfo> {
         let mut allocation_info: ffi::VmaVirtualAllocationInfo = mem::zeroed();
         ffi::vmaGetVirtualAllocationInfo(self.internal, allocation.0, &mut allocation_info);
         Ok(allocation_info.into())

@@ -1,6 +1,6 @@
 use crate::ffi;
-use ash::vk;
-use ash::vk::PhysicalDevice;
+use spark::vk;
+use spark::vk::PhysicalDevice;
 use bitflags::bitflags;
 use std::marker::PhantomData;
 use std::ops::Deref;
@@ -25,7 +25,7 @@ pub enum MemoryUsage {
     ///   device multiple times, e.g. textures to be sampled, vertex buffers, uniform
     ///   (constant) buffers, and majority of other types of resources used on GPU.
     ///
-    /// Allocation may still end up in `ash::vk::MemoryPropertyFlags::HOST_VISIBLE` memory on some implementations.
+    /// Allocation may still end up in `spark::vk::MemoryPropertyFlags::HOST_VISIBLE` memory on some implementations.
     /// In such case, you are free to map it.
     /// You can use `AllocationCreateFlags::MAPPED` with this usage type.
     #[deprecated(since = "0.3")]
@@ -33,7 +33,7 @@ pub enum MemoryUsage {
 
     /// Memory will be mappable on host.
     /// It usually means CPU (system) memory.
-    /// Guarantees to be `ash::vk::MemoryPropertyFlags::HOST_VISIBLE` and `ash::vk::MemoryPropertyFlags::HOST_COHERENT`.
+    /// Guarantees to be `spark::vk::MemoryPropertyFlags::HOST_VISIBLE` and `spark::vk::MemoryPropertyFlags::HOST_COHERENT`.
     /// CPU access is typically uncached. Writes may be write-combined.
     /// Resources created in this pool may still be accessible to the device, but access to them can be slow.
     /// It is roughly equivalent of `D3D12_HEAP_TYPE_UPLOAD`.
@@ -42,7 +42,7 @@ pub enum MemoryUsage {
     #[deprecated(since = "0.3")]
     CpuOnly,
 
-    /// Memory that is both mappable on host (guarantees to be `ash::vk::MemoryPropertyFlags::HOST_VISIBLE`) and preferably fast to access by GPU.
+    /// Memory that is both mappable on host (guarantees to be `spark::vk::MemoryPropertyFlags::HOST_VISIBLE`) and preferably fast to access by GPU.
     /// CPU access is typically uncached. Writes may be write-combined.
     ///
     /// Usage: Resources written frequently by host (dynamic), read by device. E.g. textures, vertex buffers,
@@ -50,7 +50,7 @@ pub enum MemoryUsage {
     #[deprecated(since = "0.3")]
     CpuToGpu,
 
-    /// Memory mappable on host (guarantees to be `ash::vk::MemoryPropertFlags::HOST_VISIBLE`) and cached.
+    /// Memory mappable on host (guarantees to be `spark::vk::MemoryPropertFlags::HOST_VISIBLE`) and cached.
     /// It is roughly equivalent of `D3D12_HEAP_TYPE_READBACK`.
     ///
     /// Usage:
@@ -64,7 +64,7 @@ pub enum MemoryUsage {
     #[deprecated(since = "0.3")]
     CpuCopy,
 
-    /// Lazily allocated GPU memory having (guarantees to be `ash::vk::MemoryPropertFlags::LAZILY_ALLOCATED`).
+    /// Lazily allocated GPU memory having (guarantees to be `spark::vk::MemoryPropertFlags::LAZILY_ALLOCATED`).
     /// Exists mostly on mobile platforms. Using it on desktop PC or other GPUs with no such memory type present will fail the allocation.
     ///
     /// Usage:
@@ -223,10 +223,10 @@ bitflags! {
         /// Use it for special, big resources, like fullscreen images used as attachments.
         const DEDICATED_MEMORY = ffi::VmaAllocationCreateFlagBits::VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT as u32;
 
-        /// Set this flag to only try to allocate from existing `ash::vk::DeviceMemory` blocks and never create new such block.
+        /// Set this flag to only try to allocate from existing `spark::vk::DeviceMemory` blocks and never create new such block.
         ///
         /// If new allocation cannot be placed in any of the existing blocks, allocation
-        /// fails with `ash::vk::Result::ERROR_OUT_OF_DEVICE_MEMORY` error.
+        /// fails with `spark::vk::Result::ERROR_OUT_OF_DEVICE_MEMORY` error.
         ///
         /// You should not use `AllocationCreateFlags::DEDICATED_MEMORY` and `AllocationCreateFlags::NEVER_ALLOCATE` at the same time. It makes no sense.
         const NEVER_ALLOCATE = ffi::VmaAllocationCreateFlagBits::VMA_ALLOCATION_CREATE_NEVER_ALLOCATE_BIT as u32;
@@ -236,9 +236,9 @@ bitflags! {
         /// Pointer to mapped memory will be returned through `Allocation::get_mapped_data()`.
         ///
         /// Is it valid to use this flag for allocation made from memory type that is not
-        /// `ash::vk::MemoryPropertyFlags::HOST_VISIBLE`. This flag is then ignored and memory is not mapped. This is
+        /// `spark::vk::MemoryPropertyFlags::HOST_VISIBLE`. This flag is then ignored and memory is not mapped. This is
         /// useful if you need an allocation that is efficient to use on GPU
-        /// (`ash::vk::MemoryPropertyFlags::DEVICE_LOCAL`) and still want to map it directly if possible on platforms that
+        /// (`spark::vk::MemoryPropertyFlags::DEVICE_LOCAL`) and still want to map it directly if possible on platforms that
         /// support it (e.g. Intel GPU).
         ///
         /// You should not use this flag together with `AllocationCreateFlags::CAN_BECOME_LOST`.
@@ -385,16 +385,16 @@ pub struct AllocatorCreateInfo<'a, I, D> {
 
 impl<'a, I, D> AllocatorCreateInfo<'a, I, D>
 where
-    I: Deref<Target = ash::Instance>,
-    D: Deref<Target = ash::Device>,
+    I: Deref<Target = spark::Instance>,
+    D: Deref<Target = spark::Device>,
 {
-    pub fn new(instance: I, device: D, physical_device: ash::vk::PhysicalDevice) -> Self {
+    pub fn new(instance: I, device: D, physical_device: spark::vk::PhysicalDevice) -> Self {
         Self {
             inner: ffi::VmaAllocatorCreateInfo {
                 flags: 0,
                 physicalDevice: physical_device,
-                instance: instance.handle(),
-                device: device.handle(),
+                instance: instance.handle,
+                device: device.handle,
                 preferredLargeHeapBlockSize: 0,
                 pAllocationCallbacks: ptr::null(),
                 pDeviceMemoryCallbacks: ptr::null(),
@@ -420,7 +420,7 @@ where
         self
     }
 
-    pub fn heap_size_limit(mut self, device_sizes: &'a [ash::vk::DeviceSize]) -> Self {
+    pub fn heap_size_limit(mut self, device_sizes: &'a [spark::vk::DeviceSize]) -> Self {
         unsafe {
             debug_assert!(
                 self.instance
@@ -433,7 +433,7 @@ where
         self
     }
 
-    pub fn allocation_callback(mut self, allocation: &'a ash::vk::AllocationCallbacks) -> Self {
+    pub fn allocation_callback(mut self, allocation: &'a spark::vk::AllocationCallbacks) -> Self {
         self.inner.pAllocationCallbacks = allocation as *const _;
         self
     }
@@ -445,7 +445,7 @@ where
 
     pub fn external_memory_handles(
         mut self,
-        external_memory_handles: &'a [ash::vk::ExternalMemoryHandleTypeFlagsKHR],
+        external_memory_handles: &'a [spark::vk::ExternalMemoryHandleTypeFlagsKHR],
     ) -> Self {
         unsafe {
             debug_assert!(
@@ -517,8 +517,8 @@ impl<'a> PoolCreateInfo<'a> {
         self
     }
 
-    pub fn memory_allocate(mut self, next: &'a mut ash::vk::MemoryAllocateInfo) -> Self {
-        self.inner.pMemoryAllocateNext = next as *mut ash::vk::MemoryAllocateInfo as *mut _;
+    pub fn memory_allocate(mut self, next: &'a mut spark::vk::MemoryAllocateInfo) -> Self {
+        self.inner.pMemoryAllocateNext = next as *mut spark::vk::MemoryAllocateInfo as *mut _;
         self
     }
 }
@@ -766,7 +766,7 @@ impl<'a> VirtualBlockCreateInfo<'a> {
         }
     }
 
-    pub fn allocation_callback(mut self, allocation: &'a ash::vk::AllocationCallbacks) -> Self {
+    pub fn allocation_callback(mut self, allocation: &'a spark::vk::AllocationCallbacks) -> Self {
         self.inner.pAllocationCallbacks = allocation as *const _;
         self
     }

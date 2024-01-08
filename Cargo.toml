@@ -29,7 +29,7 @@ travis-ci = { repository = "gwihlidal/vk-mem-rs" }
 maintenance = { status = "actively-developed" }
 
 [dependencies]
-ash = { version = "0.37", default-features = false }
+spark = { git = "https://github.com/insertt/spark" }
 bitflags = "1.2.1"
 
 [build-dependencies]
@@ -45,8 +45,5 @@ opt-level = 3
 codegen-units = 1
 
 [features]
-default = ["loaded"]
-generate_bindings=["bindgen"]
-linked=["ash/linked"]
-loaded=["ash/loaded"]
-recording=[]
+generate_bindings = ["bindgen"]
+recording = []

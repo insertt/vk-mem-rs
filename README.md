@@ -98,15 +98,15 @@ let create_info = vk_mem::AllocationCreateInfo {
 
 let (buffer, allocation, allocation_info) = allocator
     .create_buffer(
-        &ash::vk::BufferCreateInfo::builder()
+        &spark::vk::BufferCreateInfo::builder()
             .size(16 * 1024)
-            .usage(ash::vk::BufferUsageFlags::VERTEX_BUFFER | ash::vk::BufferUsageFlags::TRANSFER_DST)
+            .usage(spark::vk::BufferUsageFlags::VERTEX_BUFFER | spark::vk::BufferUsageFlags::TRANSFER_DST)
             .build(),
         &create_info,
     )
     .unwrap();
 
-// Do stuff with buffer! (type is ash::vk::Buffer)
+// Do stuff with buffer! (type is spark::vk::Buffer)
 
 // Destroy the buffer
 allocator.destroy_buffer(buffer, &allocation).unwrap();
@@ -114,8 +114,8 @@ allocator.destroy_buffer(buffer, &allocation).unwrap();
 
 With this one function call (`vk_mem::Allocator::create_buffer`):
 
-- `ash::vk::Buffer` (`VkBuffer`) is created.
-- `ash::vk::DeviceMemory` (`VkDeviceMemory`) block is allocated if needed.
+- `spark::vk::Buffer` (`VkBuffer`) is created.
+- `spark::vk::DeviceMemory` (`VkDeviceMemory`) block is allocated if needed.
 - An unused region of the memory block is bound to this buffer.
 - `vk_mem::Allocation` is created that represents memory assigned to this buffer. It can be queried for parameters like Vulkan memory handle and offset.
 

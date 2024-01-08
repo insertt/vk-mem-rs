@@ -1,7 +1,6 @@
 use crate::ffi;
 use crate::Allocator;
-use ash::prelude::VkResult;
-use ash::vk;
+use spark::{Result, vk};
 
 pub use ffi::VmaDefragmentationMove as DefragmentationMove;
 pub use ffi::VmaDefragmentationStats as DefragmentationStats;
@@ -35,7 +34,7 @@ impl<'a> DefragmentationContext<'a> {
     }
 
     /// Returns `false` if no more moves are possible or `true` if more defragmentations are possible.
-    pub fn begin_pass(&self, mover: impl FnOnce(&mut [DefragmentationMove]) -> ()) -> bool {
+    pub fn begin_pass(&self, mover: impl FnOnce(&mut [DefragmentationMove])) -> bool {
         let mut pass_info = ffi::VmaDefragmentationPassMoveInfo {
             moveCount: 0,
             pMoves: std::ptr::null_mut(),
@@ -69,7 +68,7 @@ impl Allocator {
     pub unsafe fn begin_defragmentation(
         &self,
         info: &ffi::VmaDefragmentationInfo,
-    ) -> VkResult<DefragmentationContext> {
+    ) -> Result<DefragmentationContext> {
         let mut context: ffi::VmaDefragmentationContext = std::ptr::null_mut();
 
         ffi::vmaBeginDefragmentation(self.internal, info, &mut context).result()?;

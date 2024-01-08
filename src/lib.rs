@@ -49,83 +49,83 @@ unsafe impl Sync for Allocation {}
 
 impl Allocator {
     /// Constructor a new `Allocator` using the provided options.
-    pub fn new<'a, I, D>(create_info: AllocatorCreateInfo<'a, I, D>) -> Result<Self>
+    pub fn new<I, D>(mut create_info: AllocatorCreateInfo<I, D>) -> Result<Self>
     where
         I: Deref<Target = spark::Instance>,
         D: Deref<Target = spark::Device>,
     {
         unsafe extern "system" fn get_instance_proc_addr_stub(
-            _instance: spark::vk::Instance,
+            _instance: Option<spark::vk::Instance>,
             _p_name: *const ::std::os::raw::c_char,
-        ) -> spark::vk::FnVoidFunction {
+        ) -> Option<spark::vk::FnVoidFunction> {
             panic!("VMA_DYNAMIC_VULKAN_FUNCTIONS is unsupported")
         }
 
-        unsafe extern "system" fn get_get_device_proc_stub(
-            _device: spark::vk::Device,
+        unsafe extern "system" fn get_device_proc_stub(
+            _device: Option<spark::vk::Device>,
             _p_name: *const ::std::os::raw::c_char,
-        ) -> spark::vk::FnVoidFunction {
+        ) -> Option<spark::vk::FnVoidFunction> {
             panic!("VMA_DYNAMIC_VULKAN_FUNCTIONS is unsupported")
         }
 
         #[cfg(feature = "loaded")]
         let routed_functions = ffi::VmaVulkanFunctions {
             vkGetInstanceProcAddr: get_instance_proc_addr_stub,
-            vkGetDeviceProcAddr: get_get_device_proc_stub,
+            vkGetDeviceProcAddr: get_device_proc_stub,
             vkGetPhysicalDeviceProperties: create_info
                 .instance
-                .fp_v1_0()
-                .get_physical_device_properties,
+                .fp_get_physical_device_properties
+                .unwrap(),
             vkGetPhysicalDeviceMemoryProperties: create_info
                 .instance
-                .fp_v1_0()
-                .get_physical_device_memory_properties,
-            vkAllocateMemory: create_info.device.fp_v1_0().allocate_memory,
-            vkFreeMemory: create_info.device.fp_v1_0().free_memory,
-            vkMapMemory: create_info.device.fp_v1_0().map_memory,
-            vkUnmapMemory: create_info.device.fp_v1_0().unmap_memory,
-            vkFlushMappedMemoryRanges: create_info.device.fp_v1_0().flush_mapped_memory_ranges,
+                .fp_get_physical_device_memory_properties
+                .unwrap(),
+            vkAllocateMemory: create_info.device.fp_allocate_memory.unwrap(),
+            vkFreeMemory: create_info.device.fp_free_memory.unwrap(),
+            vkMapMemory: create_info.device.fp_map_memory.unwrap(),
+            vkUnmapMemory: create_info.device.fp_unmap_memory.unwrap(),
+            vkFlushMappedMemoryRanges: create_info.device.fp_flush_mapped_memory_ranges.unwrap(),
             vkInvalidateMappedMemoryRanges: create_info
                 .device
-                .fp_v1_0()
-                .invalidate_mapped_memory_ranges,
-            vkBindBufferMemory: create_info.device.fp_v1_0().bind_buffer_memory,
-            vkBindImageMemory: create_info.device.fp_v1_0().bind_image_memory,
+                .fp_invalidate_mapped_memory_ranges
+                .unwrap(),
+            vkBindBufferMemory: create_info.device.fp_bind_buffer_memory.unwrap(),
+            vkBindImageMemory: create_info.device.fp_bind_image_memory.unwrap(),
             vkGetBufferMemoryRequirements: create_info
                 .device
-                .fp_v1_0()
-                .get_buffer_memory_requirements,
+                .fp_get_buffer_memory_requirements
+                .unwrap(),
             vkGetImageMemoryRequirements: create_info
                 .device
-                .fp_v1_0()
-                .get_image_memory_requirements,
-            vkCreateBuffer: create_info.device.fp_v1_0().create_buffer,
-            vkDestroyBuffer: create_info.device.fp_v1_0().destroy_buffer,
-            vkCreateImage: create_info.device.fp_v1_0().create_image,
-            vkDestroyImage: create_info.device.fp_v1_0().destroy_image,
-            vkCmdCopyBuffer: create_info.device.fp_v1_0().cmd_copy_buffer,
+                .fp_get_image_memory_requirements
+                .unwrap(),
+            vkCreateBuffer: create_info.device.fp_create_buffer.unwrap(),
+            vkDestroyBuffer: create_info.device.fp_destroy_buffer.unwrap(),
+            vkCreateImage: create_info.device.fp_create_image.unwrap(),
+            vkDestroyImage: create_info.device.fp_destroy_image.unwrap(),
+            vkCmdCopyBuffer: create_info.device.fp_cmd_copy_buffer.unwrap(),
             vkGetBufferMemoryRequirements2KHR: create_info
                 .device
-                .fp_v1_1()
-                .get_buffer_memory_requirements2,
+                .fp_get_buffer_memory_requirements2
+                .unwrap(),
             vkGetImageMemoryRequirements2KHR: create_info
                 .device
-                .fp_v1_1()
-                .get_image_memory_requirements2,
-            vkBindBufferMemory2KHR: create_info.device.fp_v1_1().bind_buffer_memory2,
-            vkBindImageMemory2KHR: create_info.device.fp_v1_1().bind_image_memory2,
+                .fp_get_image_memory_requirements2
+                .unwrap(),
+            vkBindBufferMemory2KHR: create_info.device.fp_bind_buffer_memory2.unwrap(),
+            vkBindImageMemory2KHR: create_info.device.fp_bind_image_memory2.unwrap(),
             vkGetPhysicalDeviceMemoryProperties2KHR: create_info
                 .instance
-                .fp_v1_1()
-                .get_physical_device_memory_properties2,
+                .fp_get_physical_device_memory_properties2
+                .unwrap(),
             vkGetDeviceBufferMemoryRequirements: create_info
                 .device
-                .fp_v1_3()
-                .get_device_buffer_memory_requirements,
+                .fp_get_device_buffer_memory_requirements
+                .unwrap(),
             vkGetDeviceImageMemoryRequirements: create_info
                 .device
-                .fp_v1_3()
-                .get_device_image_memory_requirements,
+                .fp_get_device_image_memory_requirements
+                .unwrap(),
         };
         #[cfg(feature = "loaded")]
         {
